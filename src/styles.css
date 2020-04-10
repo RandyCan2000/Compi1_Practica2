@@ -1,1 +1,112 @@
 /* You can add global styles to this file, and also import other style files */
+#Cuerpo{
+    background-color: rgba(20, 234, 152, 0.24);
+}
+#Boton{
+    background-color: rgba(234, 20, 23, 0.199);
+    border-color:rgba(252, 252, 252, 0) ;
+    color: seashell;
+    margin-top: 15px;
+    margin-left: 15px;
+    border-radius:8px;
+    box-shadow: 4px 4px 8px #999;
+}
+#Botones{
+    background-color: rgba(20,12,0,0.65);
+    box-shadow: 4px 4px 8px #999;
+}
+.CajaTexto{
+    margin-top: 20px;
+    box-shadow: 15px 15px 25px #999;
+    border-radius:8px;
+    background-color: rgba(56, 75, 22, 1);
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: medium;
+}
+
+#Abrir{
+    visibility: hidden;
+    width: 0;
+    background-color:rgba(252, 252, 252, 0);
+    border-color:rgba(252, 252, 252, 0) ;
+    width: 150px;
+    height: 30px;
+}
+#Abrir::before {
+    content: 'ABRIR';
+    background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 10pt;
+    visibility: visible;
+    position: absolute;
+    background-color:rgba(252, 252, 252, 0);
+    border-color:rgba(252, 252, 252, 0) ;
+    width: 150px;
+    height: 30px;
+  }
+  #Abrir:hover::before {
+    background-color:rgba(252, 252, 252, 0);
+    border-color:rgba(252, 252, 252, 0) ;
+    width: 150px;
+    height: 30px;
+  }
+  #Abrir:active::before {
+    background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+    background-color:rgba(252, 252, 252, 0);
+    border-color:rgba(252, 252, 252, 0) ;
+    width: 150px;
+    height: 30px;
+  }
+  #Reportes{
+      width: 80%;
+      height: 400px;
+      background-color: rgba(172, 240, 94, 0.712);
+      position: absolute;
+      top: 915px;
+      left: 10%;
+      border-radius:8px;
+        box-shadow: 4px 4px 8px #999;
+  }
+  #BotonesReportes{
+      position: absolute;
+      top: 850px;
+      left: 10%;
+      width: 80%; 
+      height: 65px;
+      background-color: rgba(20,12,0,0.65);
+      border-radius:8px;
+        box-shadow: 4px 4px 8px #999;
+  }
+  #HTML,#JSON,#CONSOLA{
+    position: absolute;
+    margin-top: 2.5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    z-index: 0;
+    border-radius: 8px;
+  }
+  #VARIABLES{
+    overflow:scroll;
+    position: absolute;
+    margin-top: 2.5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    background-color:rgb(0, 143, 95);
+    z-index: 1;
+    border-radius: 8px;
+  }
+#RepText{
+    background-color:rgb(0, 143, 95);
+    color: white;
+    border-radius: 8px;
+}

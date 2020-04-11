@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Tokens} from '../Typescript/TDA/Tokens';
-import {Error} from '../Typescript/TDA/Errores';
+import {Tokens} from './TDA/Tokens';
+import {Error} from './TDA/Errores';
 @Injectable()
 export class Globales{
     public static ContadorCapazRep:number=1;

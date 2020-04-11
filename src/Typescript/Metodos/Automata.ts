@@ -26,23 +26,28 @@ export class Automata{
                     let PosText:String="";
                     let Permiso:boolean=false;
                     for(let Aux:number=Indice;Aux<Texto.length;Aux++){
-                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("){
-                            if(PosText=="int"||PosText=="char"||PosText=="double"||PosText=="string"||PosText=="bool"||PosText=="void"||PosText=="if"){
+                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"){
+                            if(PosText=="int"||PosText=="char"||PosText=="double"||PosText=="string"||PosText=="bool"||
+                            PosText=="void"||PosText=="if"||PosText=="while"||PosText=="do"||PosText=="else"||PosText=="for"){
                                 Permiso=true;break;}
                         }else{PosText+=Texto.charAt(Aux);}
                     }
                     if(Letra=="\n"||Letra=="\t"||Letra==" "){Estado=0;}
                     else if(Letra=="/"){Estado=1;Token=Letra;}//Cometarios
                     else if(Letra=="i" && Permiso==true){Estado=4;Token=Letra;}//Palabras con i (int, if)
-                    else if(Letra=="d" && Permiso==true){Estado=5;Token=Letra;}//Palabras con d
+                    else if(Letra=="d" && Permiso==true){Estado=5;Token=Letra;}//Palabras con d (double, do)
                     else if(Letra=="c" && Permiso==true){Estado=6;Token=Letra;}//Palabras con c
                     else if(Letra=="b" && Permiso==true){Estado=7;Token=Letra;}//Palabras con b
                     else if(Letra=="s" && Permiso==true){Estado=8;Token=Letra;}//Palabras con s
-                    else if(Letra=="v" && Permiso==true){Estado=13;Token=Letra;}//Palabras con v
+                    else if(Letra=="v" && Permiso==true && PVoidID==false){Estado=13;Token=Letra;}//Palabras con v
+                    else if(Letra=="w" && Permiso==true){Estado=25;Token=Letra;}//Palabras con w
+                    else if(Letra=="e" && Permiso==true){Estado=26;Token=Letra;}//Palabras con e (else)
+                    else if(Letra=="f" && Permiso==true){Estado=28;Token=Letra;}//Palabras con f (for)
                     else if(Letra=="}"){
                         this.TOK=new Tokens("}",Fila,Columna);
                         Globales.TOKENS.push(this.TOK);
-                        Estado=0;Token="";}//Fin Funcion }
+                        Estado=0;Token="";
+                    }//Fin Funcion }
                     else if((Letra.charCodeAt(0)>=33 && Letra.charCodeAt(0)<=64)||
                     (Letra.charCodeAt(0)>=91 && Letra.charCodeAt(0)<=94)||
                     (Letra.charCodeAt(0)==96)||
@@ -157,6 +162,43 @@ export class Automata{
                     else if(Letra=="u"){Token+=Letra;}
                     else if(Letra=="b"){Token+=Letra;}
                     else if(Letra=="l"){Token+=Letra;}
+                    else if(Letra==" "){
+                        if(Token=="do"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            Token="";
+                            for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                                if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="\t"||Texto.charAt(Aux)=="\n"){}
+                                else if(Texto.charAt(Aux)=="{"){
+                                    this.TOK=new Tokens("{",Fila,Columna);
+                                    Globales.TOKENS.push(this.TOK);
+                                    Indice=Aux;
+                                    Estado=0;
+                                    break;
+                                }else{
+                                    Token+=Letra;
+                                    Indice=Aux;
+                                    this.ERR=new Error("SINTACTICO","{",Fila,Columna);
+                                    Estado=400;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if(Letra=="{"){
+                        if(Token=="do"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            this.TOK=new Tokens("{",Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            Token="";
+                            Estado=0;
+                        }else{
+                            Token+=Letra;
+                            this.ERR=new Error("SINTACTICO","do",Fila,Columna);
+                            Estado=400;
+                        }
+                    }
                     else if(Letra=="e"){
                         Token+=Letra;
                         if(Token=="double"){
@@ -572,13 +614,22 @@ export class Automata{
                     else {
                         Token="";
                         for(let Aux:number=Indice;Aux<Texto.length;Aux++){
-                            if(Texto.charAt(Aux)=="\t"||Texto.charAt(Aux)==" "||Texto.charAt(Aux)==")"||Texto.charAt(Aux)=="&"
+                            if(Texto.charAt(Aux)==")"||Texto.charAt(Aux)=="&"
                             ||Texto.charAt(Aux)=="|"||Texto.charAt(Aux)=="!"){
                                 Indice=Aux-1;
                                 Estado=23;
                                 this.TOK=new Tokens(Token,Fila,Columna);
                                 Globales.TOKENS.push(this.TOK);
                                 Token="";
+                                break;
+                            }else if(Texto.charAt(Aux)==";"){
+                                Indice=Aux;
+                                this.TOK=new Tokens(Token,Fila,Columna);
+                                Globales.TOKENS.push(this.TOK);
+                                this.TOK=new Tokens(";",Fila,Columna);
+                                Globales.TOKENS.push(this.TOK);
+                                Token="";
+                                Estado=34;
                                 break;
                             }
                             else{Token+=Texto.charAt(Aux);}
@@ -604,7 +655,7 @@ export class Automata{
                     }
                     break;
                 case 24://Corchete o punto y coma
-                    if(Letra==" "||Letra=="\t"){}
+                    if(Letra==" "||Letra=="\t"||Letra=="\n"){}
                     else if(Letra=="{"){
                         this.TOK=new Tokens("{",Fila,Columna);
                         Globales.TOKENS.push(this.TOK);Token="";Estado=0;
@@ -612,6 +663,217 @@ export class Automata{
                     else if(Letra==";"){
                         this.TOK=new Tokens(";",Fila,Columna);
                         Globales.TOKENS.push(this.TOK);Token="";Estado=0;
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","{ o ;",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 25://reconocimineto de while
+                    if(Letra=="h"){Token+=Letra;}
+                    else if(Letra=="i"){Token+=Letra;}
+                    else if(Letra=="l"){Token+=Letra;}
+                    else if(Letra=="e"){
+                        Token+=Letra;
+                        if(Token=="while"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=19;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","while",Fila,Columna);
+                            Estado=400;
+                        }
+                    }//acepta 
+                    else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","while",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 26:
+                    if(Letra=="l"){Token+=Letra;}
+                    else if(Letra=="s"){Token+=Letra;}
+                    else if(Letra=="e"){
+                        Token+=Letra;
+                        if(Token=="else"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=27;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","else",Fila,Columna);
+                            Estado=400;
+                        }
+                    }//acepta else
+                    else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","else",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 27:
+                    if(Letra==" "||Letra=="\t"||Letra=="\n"){}
+                    else if(Letra=="{"){
+                        this.TOK=new Tokens("{",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=0;
+                    }
+                    else if(Letra=="i" && Texto.charAt(Indice-1)==" "){Token=Letra;Estado=4;}
+                    else if(Letra=="i" && Texto.charAt(Indice-1)!=" "){
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","else if",Fila,Columna);
+                        Estado=400;
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","else o else if",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 28:
+                    if(Letra=="o"){Token+=Letra;}
+                    else if(Letra=="r"){
+                        Token+=Letra;
+                        if(Token=="for"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=29;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","for",Fila,Columna);
+                            Estado=400;
+                        }
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","for",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 29:
+                    if(Letra==" "||Letra=="\t"){}
+                    else if(Letra=="("){
+                        this.TOK=new Tokens("(",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=30;
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","(",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 30:
+                    if((Letra==" "||Letra=="\t") && Token==""){}
+                    else if(Letra=="i"){Token+=Letra;}
+                    else if(Letra=="n"){Token+=Letra;}
+                    else if(Letra=="t"){Token+=Letra;
+                        if(Token=="int"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=31;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","int",Fila,Columna);
+                            Estado=400;
+                        }
+                    }
+                    else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","int",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 31:
+                    if((Letra==" "||Letra=="\t")&& Token==""){}
+                    else if(((Letra.charCodeAt(0)>=65 && Letra.charCodeAt(0)<=90)||
+                    (Letra.charCodeAt(0)>=97 && Letra.charCodeAt(0)<=122)||
+                    (Letra.charCodeAt(0)==95))&&Token==""){Token=Letra;}
+                    else if(((Letra.charCodeAt(0)>=65 && Letra.charCodeAt(0)<=90)||
+                    (Letra.charCodeAt(0)>=97 && Letra.charCodeAt(0)<=122)||
+                    (Letra.charCodeAt(0)>=48 && Letra.charCodeAt(0)<=57)||
+                    (Letra.charCodeAt(0)==95))&& Token!=""){
+                        Token+=Letra;
+                    }else if((Letra==" "||Letra=="\t")&& Token!=""){
+                        this.TOK=new Tokens(Token,Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=32;
+                    }
+                    else if(Letra=="="){
+                        this.TOK=new Tokens(Token,Fila,Columna);Indice--;
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=32;
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","VARIABLE",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 32:
+                    if(Letra==" "||Letra=="\t"){}
+                    else if(Letra=="="){
+                        this.TOK=new Tokens("=",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=33;
+                    }
+                    break;
+                case 33:
+                    Token="";
+                    for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                        if(Texto.charAt(Aux)==";"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            this.TOK=new Tokens(";",Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=20;
+                            Indice=Aux;
+                            break;
+                        }
+                        else{Token+=Texto.charAt(Aux);}
+                    }
+                    break;
+                case 34:
+                    if(Letra==" "||Letra=="\t"){}
+                    else{
+                        Token="";
+                        for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                            if(Texto.charAt(Aux)=="+"||Texto.charAt(Aux)=="-"){
+                                this.TOK=new Tokens(Token,Fila,Columna);
+                                Globales.TOKENS.push(this.TOK);Token="";Estado=35;
+                                Indice=Aux;
+                                Token=Texto.charAt(Aux);
+                                break;
+                            }else if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="\t"){
+                                Token+=Texto.charAt(Aux);
+                                this.ERR=new Error("SINTACTICO","VARIABLE",Fila,Columna);
+                                Estado=400;
+                            }
+                            else{Token+=Texto.charAt(Aux);}
+                        }
+                    }
+                    break;
+                case 35:
+                    if(Letra=="+"||Letra=="-"){
+                        Token+=Letra;
+                        if(Token=="++"||Token=="--"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=36;
+                        }
+                        else{
+                            this.ERR=new Error("SINTACTICO","++ o --",Fila,Columna);
+                            Estado=400;
+                        }
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","++ o --",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 36:
+                    if(Letra==" "||Letra=="\t"){}
+                    else if(Letra==")"){
+                        this.TOK=new Tokens(")",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=37;
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","++ o --",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 37:
+                    if(Letra==" "||Letra=="\t"||Letra=="\n"){}
+                    else if(Letra=="{"){
+                        this.TOK=new Tokens("{",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=0;
+                    }
+                    else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","{",Fila,Columna);
+                        Estado=400;
                     }
                     break;
                 case 399://Errores Lexicos

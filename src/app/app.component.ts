@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {Globales} from '../app/Typescript/Globales';
-import {Automata} from '../app//Typescript/Metodos/Automata';
+import {Globales} from '../Typescript/Globales';
+import {Automata} from '../Typescript/Metodos/Automata';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

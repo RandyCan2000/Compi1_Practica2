@@ -26,9 +26,10 @@ export class Automata{
                     let PosText:String="";
                     let Permiso:boolean=false;
                     for(let Aux:number=Indice;Aux<Texto.length;Aux++){
-                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"){
+                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"||Texto.charAt(Aux)=="."){
                             if(PosText=="int"||PosText=="char"||PosText=="double"||PosText=="string"||PosText=="bool"||
-                            PosText=="void"||PosText=="if"||PosText=="while"||PosText=="do"||PosText=="else"||PosText=="for"){
+                            PosText=="void"||PosText=="if"||PosText=="while"||PosText=="do"||PosText=="else"||PosText=="for"||
+                            PosText=="switch"||PosText=="case"||PosText=="break"||PosText=="continue"||PosText=="return"||PosText=="Console"){
                                 Permiso=true;break;}
                         }else{PosText+=Texto.charAt(Aux);}
                     }
@@ -36,13 +37,15 @@ export class Automata{
                     else if(Letra=="/"){Estado=1;Token=Letra;}//Cometarios
                     else if(Letra=="i" && Permiso==true){Estado=4;Token=Letra;}//Palabras con i (int, if)
                     else if(Letra=="d" && Permiso==true){Estado=5;Token=Letra;}//Palabras con d (double, do)
-                    else if(Letra=="c" && Permiso==true){Estado=6;Token=Letra;}//Palabras con c
-                    else if(Letra=="b" && Permiso==true){Estado=7;Token=Letra;}//Palabras con b
-                    else if(Letra=="s" && Permiso==true){Estado=8;Token=Letra;}//Palabras con s
-                    else if(Letra=="v" && Permiso==true && PVoidID==false){Estado=13;Token=Letra;}//Palabras con v
-                    else if(Letra=="w" && Permiso==true){Estado=25;Token=Letra;}//Palabras con w
+                    else if(Letra=="c" && Permiso==true){Estado=6;Token=Letra;}//Palabras con c (char, case, continue)
+                    else if(Letra=="b" && Permiso==true){Estado=7;Token=Letra;}//Palabras con b (bool, break)
+                    else if(Letra=="s" && Permiso==true){Estado=8;Token=Letra;}//Palabras con s (string, switch)
+                    else if(Letra=="v" && Permiso==true && PVoidID==false){Estado=13;Token=Letra;}//Palabras con v (void)
+                    else if(Letra=="w" && Permiso==true){Estado=25;Token=Letra;}//Palabras con w (while)
                     else if(Letra=="e" && Permiso==true){Estado=26;Token=Letra;}//Palabras con e (else)
                     else if(Letra=="f" && Permiso==true){Estado=28;Token=Letra;}//Palabras con f (for)
+                    else if(Letra=="r" && Permiso==true){Estado=42;Token=Letra;}//Palabras con r (return)
+                    else if(Letra=="C" && Permiso==true){Estado=44;Token=Letra;}//Palabras con c (Console)
                     else if(Letra=="}"){
                         this.TOK=new Tokens("}",Fila,Columna);
                         Globales.TOKENS.push(this.TOK);
@@ -232,8 +235,34 @@ export class Automata{
                             Estado=400;
                         }
                     }//aceptacion char
+                    else if(Letra=="s"){Token+=Letra;}
+                    else if(Letra=="e"){
+                        Token+=Letra;
+                        if(Token=="case"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            Token="";
+                            Estado=40;
+                        }else if(Token=="continue"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            Token="";
+                            Estado=41;
+                        }
+                        else{
+                            this.ERR=new Error("SINTACTICO","case",Fila,Columna);
+                            Estado=400;
+                        }
+                    }//aceptacion case
+                    //continue h a r s e
+                    else if(Letra=="o"){Token+=Letra;}
+                    else if(Letra=="n"){Token+=Letra;}
+                    else if(Letra=="t"){Token+=Letra;}
+                    else if(Letra=="i"){Token+=Letra;}
+                    else if(Letra=="n"){Token+=Letra;}
+                    else if(Letra=="u"){Token+=Letra;}
                     else{
-                        this.ERR=new Error("SINTACTICO","char",Fila,Columna);
+                        this.ERR=new Error("SINTACTICO","case",Fila,Columna);
                         Estado=400;
                     }
                     break;
@@ -251,9 +280,24 @@ export class Automata{
                             Estado=400;
                         }
                     }
+                    //break;
+                    else if(Letra=="r"){Token+=Letra;}
+                    else if(Letra=="e"){Token+=Letra;}
+                    else if(Letra=="a"){Token+=Letra;}
+                    else if(Letra=="k"){Token+=Letra;
+                        if(Token=="break"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            Token="";
+                            Estado=41;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","break",Fila,Columna);
+                            Estado=400;
+                        }
+                    }
                     else{
                         Token+=Letra;
-                        this.ERR=new Error("SINTACTICO","bool",Fila,Columna);
+                        this.ERR=new Error("SINTACTICO","bool o break",Fila,Columna);
                         Estado=400;
                     }   
                     break;
@@ -273,9 +317,27 @@ export class Automata{
                             this.ERR=new Error("SINTACTICO","string",Fila,Columna);
                             Estado=400;
                         }
-                    }else{
+                    }
+                    //switch
+                    else if(Letra=="w"){Token+=Letra;}
+                    else if(Letra=="i"){Token+=Letra;}
+                    else if(Letra=="t"){Token+=Letra;}
+                    else if(Letra=="c"){Token+=Letra;}
+                    else if(Letra=="h"){Token+=Letra;
+                        if(Token=="switch"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            Token="";
+                            Estado=38;
+                        }
+                        else{
+                            this.ERR=new Error("SINTACTICO","switch",Fila,Columna);
+                            Estado=400;
+                        }
+                    }//aceptacion de switch
+                    else{
                         Token+=Letra;
-                        this.ERR=new Error("SINTACTICO","string",Fila,Columna);
+                        this.ERR=new Error("SINTACTICO","string o switch",Fila,Columna);
                         Estado=400;
                     }
                     break;
@@ -874,6 +936,158 @@ export class Automata{
                         Token+=Letra;
                         this.ERR=new Error("SINTACTICO","{",Fila,Columna);
                         Estado=400;
+                    }
+                    break;
+                case 38://Aceptacion de switch parentesis
+                    if(Letra=="("){
+                        this.TOK=new Tokens("(",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=39;
+                    }else if(Letra==" "||Letra=="\n"){}
+                    else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","(",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 39:
+                    Token="";
+                    for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                        if(Texto.charAt(Aux)==")"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            this.TOK=new Tokens(")",Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=37;
+                            Indice=Aux;
+                            break;
+                        }else{
+                            Token+=Texto.charAt(Aux);
+                        }
+                    }
+                    break;
+                case 40:// Valor case y dos puntos;
+                    Token="";
+                    for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                        if(Texto.charAt(Aux)==":"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            this.TOK=new Tokens(":",Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=0;
+                            Indice=Aux;
+                            break;
+                        }else{Token+=Texto.charAt(Aux);}
+                    }
+                    break;
+                case 41://dos puntos de break y otros
+                    if(Letra==" "||Letra=="\t"){}
+                    else if(Letra==";"){
+                        this.TOK=new Tokens(";",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=0;
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO",";",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 42://return
+                    if(Letra=="e"){Token+=Letra;}
+                    else if(Letra=="t"){Token+=Letra;}
+                    else if(Letra=="u"){Token+=Letra;}
+                    else if(Letra=="r"){Token+=Letra;}
+                    else if(Letra=="n"){Token+=Letra;
+                        if(Token=="return"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=43;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","return",Fila,Columna);
+                            Estado=400;
+                        }
+                    }else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","return",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 43://valor , punto y coma
+                    Token="";
+                    for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                        if(Texto.charAt(Aux)==";"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            this.TOK=new Tokens(";",Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=0;
+                            Indice=Aux;
+                            break;
+                        }else{Token+=Texto.charAt(Aux);}
+                    }
+                    break;
+                case 44://Console.
+                    if(Letra=="o"){Token+=Letra;}
+                    else if(Letra=="n"){Token+=Letra;}
+                    else if(Letra=="s"){Token+=Letra;}
+                    else if(Letra=="l"){Token+=Letra;}
+                    else if(Letra=="e"){Token+=Letra;}
+                    else if(Letra=="."){Token+=Letra;
+                        if(Token=="Console."){
+                            Estado=45;
+                        }else{
+                            this.ERR=new Error("SINTACTICO","Console.write(line)",Fila,Columna);
+                            Estado=400;
+                        }
+                    }
+                    break;
+                case 45://white o writeline
+                    if(Letra=="w"){Token+=Letra;}
+                    else if(Letra=="r"){Token+=Letra;}
+                    else if(Letra=="i"){Token+=Letra;}
+                    else if(Letra=="t"){Token+=Letra;}
+                    else if(Letra=="e"){Token+=Letra;}
+                    else if(Letra=="l"){Token+=Letra;}
+                    else if(Letra=="n"){Token+=Letra;}
+                    else if(Letra==" "||Letra=="\t"){
+                        if(Token=="Console.writeline"||Token=="Console.write"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=46;
+                        }else{
+                            Token+=Letra;
+                            this.ERR=new Error("SINTACTICO","Console.write(line)",Fila,Columna);
+                            Estado=400;
+                        }
+                    }
+                    else if(Letra=="("){
+                        if(Token=="Console.writeline"||Token=="Console.write"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=46;
+                            Indice--;
+                        }else{
+                            Token+=Letra;
+                            this.ERR=new Error("SINTACTICO","Console.write(line)",Fila,Columna);
+                            Estado=400;
+                        }
+                    }
+                    else{
+                        Token+=Letra;
+                        this.ERR=new Error("SINTACTICO","Console.write(line)",Fila,Columna);
+                        Estado=400;
+                    }
+                    break;
+                case 46://parentesis de console
+                    if(Letra==" "||Letra=="\t"){}
+                    else if(Letra=="("){
+                        this.TOK=new Tokens("(",Fila,Columna);
+                        Globales.TOKENS.push(this.TOK);Token="";Estado=47;
+                    }
+                    break;
+                case 47:
+                    Token="";
+                    for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                        if(Texto.charAt(Aux)==")"){
+                            this.TOK=new Tokens(Token,Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);
+                            this.TOK=new Tokens(")",Fila,Columna);
+                            Globales.TOKENS.push(this.TOK);Token="";Estado=41;
+                            Indice=Aux;
+                            break;
+                        }else{Token+=Texto.charAt(Aux)}
                     }
                     break;
                 case 399://Errores Lexicos

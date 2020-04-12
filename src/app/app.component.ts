@@ -38,12 +38,31 @@ export class AppComponent {
               document.getElementById("NombreSeleccion").innerHTML = Titulo.innerHTML;
               document.getElementById(Titulo.innerHTML).style.zIndex = Globales.ContadorCapaz.toString();
               Globales.ContadorCapaz++;
+              //tab 
+              var el = <HTMLInputElement>document.getElementById(Titulo.innerHTML);
+              el.onkeydown = function(e) {
+              if (e.keyCode === 9) {
+                  var val = el.value,start = el.selectionStart,end = el.selectionEnd;
+                  el.value = val.substring(0, start) + '\t' + val.substring(end);
+                  el.selectionStart = el.selectionEnd = start + 1;
+              return false;}};
+              //fin tab
             };
+
             document.getElementById("Botones").appendChild(Titulo);
             div.appendChild(CajaTexto);
             div.style.marginLeft = "20%";
             document.getElementById("CajasTexto").appendChild(div);
             Globales.ContadorPestania++;
+            //tab 
+            var el = <HTMLInputElement>document.getElementById(Titulo.innerHTML);
+            el.onkeydown = function(e) {
+            if (e.keyCode === 9) {
+                var val = el.value,start = el.selectionStart,end = el.selectionEnd;
+                el.value = val.substring(0, start) + '\t' + val.substring(end);
+                el.selectionStart = el.selectionEnd = start + 1;
+            return false;}};
+            //fin tab
         };
         reader.readAsText(file);
     }

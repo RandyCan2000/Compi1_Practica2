@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {Globales} from '../Typescript/Globales';
 import {Automata} from '../Typescript/Metodos/Automata';
+import {Metodos} from '../Typescript/Metodos/Metodos';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -92,4 +93,10 @@ export class AppComponent {
         Globales.ContadorCapazRep++;
       }
     }
+
+    Traduccion(){
+      let M:Metodos=new Metodos();
+      M.Traducir("",0);
+    }
+
 }

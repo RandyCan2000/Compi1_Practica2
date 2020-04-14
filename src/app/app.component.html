@@ -6,8 +6,8 @@
             <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <img src="assets/Imagenes/herramientas.png" style="width: 50px; height:50px;"></a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
             <a class="dropdown-item"><input id="Abrir" type="file" (change)="leerArchivo($event.target.files)" accept=".cs"></a>
-            <a class="dropdown-item" href="#" (click)="Analizar()" >ANALIZAS</a>
-            <a class="dropdown-item" href="#">TRADUCIR</a>
+            <a class="dropdown-item" href="#" (click)="Analizar()" >ANALIZAR</a>
+            <a class="dropdown-item" href="#" (click)="Traduccion()">TRADUCIR</a>
             </div>
         </li>
         </ul>
@@ -38,18 +38,12 @@
         </table>
       </div>
       <div id="CONSOLA">
-        <textarea id="RepText" style="resize: none;width: 100%;height: 100%; overflow:scroll;">
-
-        </textarea>
+        <textarea id="RepText" class="CONSOLA" style="resize: none;width: 100%;height: 100%; overflow:scroll;"></textarea>
       </div>
       <div id="HTML">
-        <textarea id="RepText" style="resize: none;width: 100%;height: 100%; overflow:scroll;">
-
-        </textarea>
+        <textarea id="RepText" class="HTML" style="resize: none;width: 100%;height: 100%; overflow:scroll;"></textarea>
       </div>
       <div id="JSON">
-        <textarea id="RepText"style="resize: none; width: 100%;height: 100%; overflow:scroll;">
-
-        </textarea>
+        <textarea id="RepText" class="JSON"style="resize: none; width: 100%;height: 100%; overflow:scroll;"></textarea>
       </div>
   </div>

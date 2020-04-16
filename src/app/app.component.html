@@ -26,14 +26,16 @@
     <button id="Boton" (click)="MostarRep('HTML')">HTLM</button>
     <button id="Boton" (click)="MostarRep('JSON')">JSON</button>
     <button id="Boton" (click)="MostarRep('VARIABLES')">VARIABLES</button>
+    <button id="Boton" (click)="MostarRep('TOKENS')">TOKENS</button>
+    <button id="Boton" (click)="MostarRep('ERRORES')">ERRORES</button>
   </div>
   <div id="Reportes">
       <div id="VARIABLES" style="overflow:scroll;">
-        <table id="RepText" border="1" style="position: absolute; left: 5%; top: 5%;color: white;border-color: white;">
+        <table id="RepText" class="VARIABLES" border="1" style="position: absolute; left: 5%; top: 5%;color: white;border-color: white;">
           <tr>
-            <td> NOMBRE </td>
-            <td> TIPO </td>
-            <td> LINEA </td>
+            <th> NOMBRE </th>
+            <th> TIPO </th>
+            <th> VALOR </th>
           </tr>
         </table>
       </div>
@@ -46,4 +48,27 @@
       <div id="JSON">
         <textarea id="RepText" class="JSON"style="resize: none; width: 100%;height: 100%; overflow:scroll;"></textarea>
       </div>
+      <div id="TOKENS" style="overflow:scroll;">
+        <table id="RepText" class="TOKENS" border="1" style="position: absolute; left: 5%; top: 5%;color: white;border-color: white;">
+          <tr>
+            <th> ID </th>
+            <th> LEXEMA </th>
+            <th> FILA </th>
+            <th> COLUMNA </th>
+          </tr>
+        </table>
+      </div>
+      <div id="ERRORES" style="overflow:scroll;">
+        <table id="RepText" class="ERRORES" border="1" style="position: absolute; left: 5%; top: 5%;color: white;border-color: white;">
+          <tr>
+            <th> ID </th>
+            <th> LEXEMA </th>
+            <th> TIPO </th>
+            <th> ESPERADO </th>
+            <th> FILA </th>
+            <th> COLUMNA </th>
+          </tr>
+        </table>
+      </div>
   </div>
+  

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {Globales} from '../Globales';
 import {Tokens} from '../TDA/Tokens';
 import { Error } from '../TDA/Errores';
+import { Metodos } from './Metodos';
 export class Automata{
     ERR:Error;
     TOK:Tokens;
@@ -26,7 +27,7 @@ export class Automata{
                     let PosText:String="";
                     let Permiso:boolean=false;
                     for(let Aux:number=Indice;Aux<Texto.length;Aux++){
-                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"||Texto.charAt(Aux)=="."){
+                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"||Texto.charAt(Aux)=="."||Texto.charAt(Aux)=="\n"){
                             if(PosText=="int"||PosText=="char"||PosText=="double"||PosText=="string"||PosText=="bool"||
                             PosText=="void"||PosText=="if"||PosText=="while"||PosText=="do"||PosText=="else"||PosText=="for"||
                             PosText=="switch"||PosText=="case"||PosText=="break"||PosText=="continue"||PosText=="return"||PosText=="Console"||
@@ -1057,7 +1058,7 @@ export class Automata{
                     }
                     break;
                 case 45://white o writeline
-                    if(Letra=="w"){Token+=Letra;}
+                    if(Letra=="W"){Token+=Letra;}
                     else if(Letra=="r"){Token+=Letra;}
                     else if(Letra=="i"){Token+=Letra;}
                     else if(Letra=="t"){Token+=Letra;}
@@ -1065,23 +1066,23 @@ export class Automata{
                     else if(Letra=="l"){Token+=Letra;}
                     else if(Letra=="n"){Token+=Letra;}
                     else if(Letra==" "||Letra=="\t"){
-                        if(Token=="Console.writeline"||Token=="Console.write"){
+                        if(Token=="Console.Writeline"||Token=="Console.Write"){
                             this.TOK=new Tokens(Token,Fila,Columna);
                             Globales.TOKENS.push(this.TOK);Token="";Estado=46;
                         }else{
                             Token+=Letra;
-                            this.ERR=new Error("SINTACTICO","Console.write(line)",Fila,Columna);
+                            this.ERR=new Error("SINTACTICO","Console.Write(line)",Fila,Columna);
                             Estado=400;
                         }
                     }
                     else if(Letra=="("){
-                        if(Token=="Console.writeline"||Token=="Console.write"){
+                        if(Token=="Console.Writeline"||Token=="Console.Write"){
                             this.TOK=new Tokens(Token,Fila,Columna);
                             Globales.TOKENS.push(this.TOK);Token="";Estado=46;
                             Indice--;
                         }else{
                             Token+=Letra;
-                            this.ERR=new Error("SINTACTICO","Console.write(line)",Fila,Columna);
+                            this.ERR=new Error("SINTACTICO","Console.Write(line)",Fila,Columna);
                             Estado=400;
                         }
                     }
@@ -1165,6 +1166,9 @@ export class Automata{
                     break;
             }
         }
+        alert("SE TERMINO EL ANALISIS");
+        let M=new Metodos();
+        M.HTML_ERRORES_TOKENS();
         //Imprimir
         this.Imprimir();
     }

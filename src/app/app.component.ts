@@ -72,29 +72,33 @@ export class AppComponent {
       if(Globales.Seleccionado.toString()==""){
         alert("NO HAY NADA QUE ANALIZAR");
       }else{
+        //limpia las tablas de tokens y errores
+        var elmtTable = document.getElementsByClassName("TOKENS")[0]; 
+        var tableRows = elmtTable.getElementsByTagName('tr'); 
+        var rowCount = tableRows.length; 
+        for (var x=rowCount-1; x>0; x--) { 
+        elmtTable.removeChild(tableRows[x]); } 
+        var elmtTable = document.getElementsByClassName("ERRORES")[0]; 
+        var tableRows = elmtTable.getElementsByTagName('tr'); 
+        var rowCount = tableRows.length; 
+        for (var x=rowCount-1; x>0; x--) { 
+        elmtTable.removeChild(tableRows[x]); } 
+
         const Texto= <HTMLInputElement>document.getElementById(Globales.Seleccionado.toString());
-      this.AU.AnalisisLexico(Texto.value);
+        this.AU.AnalisisLexico(Texto.value);
       }
     }
     MostarRep(Rep:String){
-      if(Rep=="CONSOLA"){
-        document.getElementById(Rep.toString()).style.zIndex = Globales.ContadorCapazRep.toString();
-        Globales.ContadorCapazRep++;
-      }else if(Rep=="JSON"){
-        document.getElementById(Rep.toString()).style.zIndex = Globales.ContadorCapazRep.toString();
-        Globales.ContadorCapazRep++;
-      }
-      else if(Rep=="HTML"){
-        document.getElementById(Rep.toString()).style.zIndex = Globales.ContadorCapazRep.toString();
-        Globales.ContadorCapazRep++;
-      }
-      else if(Rep=="VARIABLES"){
-        document.getElementById(Rep.toString()).style.zIndex = Globales.ContadorCapazRep.toString();
-        Globales.ContadorCapazRep++;
-      }
+      document.getElementById(Rep.toString()).style.zIndex = Globales.ContadorCapazRep.toString();
+      Globales.ContadorCapazRep++;
     }
 
     Traduccion(){
+      var elmtTable = document.getElementsByClassName("VARIABLES")[0]; 
+      var tableRows = elmtTable.getElementsByTagName('tr'); 
+      var rowCount = tableRows.length; 
+      for (var x=rowCount-1; x>0; x--) { 
+      elmtTable.removeChild(tableRows[x]); } 
       let M:Metodos=new Metodos();
       M.Traducir("",0);
     }

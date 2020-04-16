@@ -3,15 +3,20 @@ import {Globales} from '../Globales';
 import {Tokens} from '../TDA/Tokens';
 import { Error } from '../TDA/Errores';
 export class Metodos{
-    
     TOKENS:Tokens[]=[];
     ContIdentacion;
+    ContIdentacionHTML;
     Traduccion:string;
     Ciclo:string[]=[];
+    TraduccionHTML:string;
+    TraduccionJSON:string;
     constructor(){
         this.TOKENS=Globales.TOKENS;
         this.ContIdentacion=0;
+        this.ContIdentacionHTML=0;
         this.Traduccion="";
+        this.TraduccionHTML="";
+        this.TraduccionJSON="";
     }
 
     Traducir(Viene:string,Ind:number){//varible Viene indica que sentencia es: if, switch, etc.
@@ -23,6 +28,11 @@ export class Metodos{
                 try {
                     if(this.TOKENS[Indice+2].Lexema=="*/"){this.Traduccion+="'''"+"\n";Indice=Indice+2;}
                     else{this.Traduccion+="'''"+"\n";Indice=Indice+1;}} catch (error) {}
+            }
+            else if(Token=="//"){
+                try {
+                    this.Traduccion+=this.EI()+"#"+this.TOKENS[Indice+1].Lexema;Indice=Indice+1;
+                } catch (error) {}
             }
             else if(Token=="string" || Token=="int"||Token=="double"||Token=="char"||Token=="bool"||Token=="void"){
                 try {
@@ -37,7 +47,8 @@ export class Metodos{
                                     TP+=this.TOKENS[Aux].Lexema+":\n";
                                     this.Traduccion+=TP;
                                     this.ContIdentacion++;
-                                    this.Ciclo.push(Token.toString());
+                                    if(Token=="void"&&this.TOKENS[Indice+1].Lexema=="main"&&this.TOKENS[Indice+2].Lexema=="("&&this.TOKENS[Indice+3].Lexema==")"){this.Ciclo.push("main");}
+                                    else{this.Ciclo.push(Token.toString());}
                                     Indice=Aux+1;
                                     break;}
                                 else{
@@ -46,14 +57,27 @@ export class Metodos{
                             }
                         }
                         else if(this.TOKENS[Indice+2].Lexema=="="){//variables
+                            const tabla= <HTMLInputElement>document.getElementsByClassName("VARIABLES")[0];
+                            const celda2=document.createElement("td");celda2.innerHTML=Token.toString();
                             this.Traduccion+=this.EI()+"var "+this.TOKENS[Indice+1].Lexema+this.TOKENS[Indice+2].Lexema+this.QuitaEspacios(this.TOKENS[Indice+3].Lexema.toString());
-                            if(this.TOKENS[Indice+4].Lexema==";"){this.Traduccion+="\n";}
+                            let Fila=document.createElement("tr");
+                            let celda1=document.createElement("td");celda1.innerHTML=this.TOKENS[Indice+1].Lexema.toString();
+                            let celda3=document.createElement("td");celda3.innerHTML=this.QuitaEspacios(this.TOKENS[Indice+3].Lexema.toString());
+                            Fila.appendChild(celda1);Fila.appendChild(celda2);Fila.appendChild(celda3);
+                            tabla.appendChild(Fila);
+                            if(this.TOKENS[Indice+4].Lexema==";"){this.Traduccion+="\n";Indice=Indice+4;}
                             else if(this.TOKENS[Indice+4].Lexema==","){
                                 for(let Aux:number=Indice+5;Aux<this.TOKENS.length;Aux++){
                                     if(this.TOKENS[Aux].Lexema==";"){this.Traduccion+="\n";Indice=Aux;break;}
                                     else {
                                         if(this.TOKENS[Aux+1].Lexema=="="){
                                             this.Traduccion+=","+this.TOKENS[Aux].Lexema+this.TOKENS[Aux+1].Lexema+this.QuitaEspacios(this.TOKENS[Aux+2].Lexema.toString());
+                                            let Fila=document.createElement("tr");
+                                            let celda1=document.createElement("td");celda1.innerHTML=this.TOKENS[Aux].Lexema.toString();
+                                            let celda2=document.createElement("td");celda2.innerHTML=Token.toString();
+                                            let celda3=document.createElement("td");celda3.innerHTML=this.QuitaEspacios(this.TOKENS[Aux+2].Lexema.toString());
+                                            Fila.appendChild(celda1);Fila.appendChild(celda2);Fila.appendChild(celda3);
+                                            tabla.appendChild(Fila);
                                             Aux=Aux+2;
                                         }
                                     }
@@ -63,33 +87,78 @@ export class Metodos{
                     }
                 } catch (error) {}
             }else if(Token=="}"){
-                if(this.Ciclo.length!=0){let text=this.Ciclo.pop();
+                if(this.Ciclo.length!=0){
+                    let text=this.Ciclo.pop();
                     if(text=="switch"){
                         this.ContIdentacion--;
                         this.Traduccion+=this.EI()+"}\n";
                     }
                     else if(text=="do"){
-                        if(this.TOKENS[Indice+1].Lexema=="while"){
-                            if(this.TOKENS[Indice+2].Lexema=="("){
-                                let TD=this.EI()+"if";
-                                for(let i:number=Indice+3;i<this.TOKENS.length;i++){
-                                    if(this.TOKENS[i].Lexema==")"){
-                                        if(this.TOKENS[i+1].Lexema==";"){
-                                            TD+=":\n"+this.EI()+" break";this.Traduccion+=TD;
-                                            Indice=i+1;break;
-                                        }
-                                    }else if(this.TOKENS[i].Lexema=="{"||this.TOKENS[i].Lexema==";"){
-                                        Indice=i;
-                                    }else{
-                                        if(this.TOKENS[i].Lexema=="&&"){TD+=" "+"and";}
-                                        else if(this.TOKENS[i].Lexema=="||"){TD+=" "+"or";}
-                                        else if(this.TOKENS[i].Lexema=="!"){TD+=" "+"not";}
-                                        else{TD+=" "+this.QuitaEspacios(this.TOKENS[i].Lexema.toString());
+                        try {
+                            if(this.TOKENS[Indice+1].Lexema=="while"){
+                                if(this.TOKENS[Indice+2].Lexema=="("){
+                                    let TD=this.EI()+"if";
+                                    for(let i:number=Indice+3;i<this.TOKENS.length;i++){
+                                        if(this.TOKENS[i].Lexema==")"){
+                                            if(this.TOKENS[i+1].Lexema==";"){
+                                                TD+=":\n"+this.EI()+" break";this.Traduccion+=TD;
+                                                Indice=i+1;break;
+                                            }
+                                        }else if(this.TOKENS[i].Lexema=="{"||this.TOKENS[i].Lexema==";"){
+                                            Indice=i;
+                                        }else{
+                                            if(this.TOKENS[i].Lexema=="&&"){TD+=" "+"and";}
+                                            else if(this.TOKENS[i].Lexema=="||"){TD+=" "+"or";}
+                                            else if(this.TOKENS[i].Lexema=="!"){TD+=" "+"not";}
+                                            else{TD+=" "+this.QuitaEspacios(this.TOKENS[i].Lexema.toString());
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
+                        } catch (error) {}
+                    }
+                    else if(text=="if"){
+                        try {
+                            if(this.TOKENS[Indice+1].Lexema=="else"){
+                                if(this.TOKENS[Indice+2].Lexema=="{"){
+                                    this.ContIdentacion--;
+                                    this.Traduccion+=this.EI()+"else:\n";
+                                    Indice=Indice+2;
+                                    this.ContIdentacion=this.ContIdentacion+2;
+                                }
+                                else if(this.TOKENS[Indice+2].Lexema=="if"){
+                                    if(this.TOKENS[Indice+3].Lexema=="("){
+                                        this.ContIdentacion--;
+                                        let TD=this.EI()+"elif";
+                                        for(let i:number=Indice+4;i<this.TOKENS.length;i++){
+                                            if(this.TOKENS[i].Lexema==")"){
+                                                if(this.TOKENS[i+1].Lexema=="{"){
+                                                    this.Ciclo.push("if");
+                                                    TD+=this.EI()+":\n";this.Traduccion+=TD;
+                                                    this.ContIdentacion=this.ContIdentacion+2;
+                                                    Indice=i+1;break;
+                                                }
+                                            }else if(this.TOKENS[i].Lexema=="{"||this.TOKENS[i].Lexema==";"){
+                                                Indice=i;
+                                            }else{
+                                                if(this.TOKENS[i].Lexema=="&&"){TD+=" "+"and";}
+                                                else if(this.TOKENS[i].Lexema=="||"){TD+=" "+"or";}
+                                                else if(this.TOKENS[i].Lexema=="!"){TD+=" "+"not";}
+                                                else{TD+=" "+this.QuitaEspacios(this.TOKENS[i].Lexema.toString());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (error) {}
+                    }
+                    else if(text=="main"){
+                        this.Traduccion+=this.EI()+"if __name__==\"__main__\":\n";
+                        this.ContIdentacion++;
+                        this.Traduccion+=this.EI()+"main()\n"
+                        this.ContIdentacion--;
                     }
                     this.ContIdentacion--;
                 }
@@ -250,7 +319,7 @@ export class Metodos{
                     
                 }
             }
-            else if(Token=="Console.writeline"||Token=="Console.write"){
+            else if(Token=="Console.Writeline"||Token=="Console.Write"){
                 try {
                     if(this.TOKENS[Indice+1].Lexema=="("){
                         if(this.TOKENS[Indice+3].Lexema==")"){
@@ -271,13 +340,27 @@ export class Metodos{
                             if(this.TOKENS[Indice+4].Lexema==";"){
                                 this.Traduccion+=this.EI()+"print("+Text+")\n";
                                 Indice=Indice+4;
+                                this.HTML_JSON(Text);
                             }
                         }
                     }
                 } catch (error) {}
+            }else{
+                if(Token!=";"||Token!="}"||Token!="{"||Token!="("||Token!=")"){
+                    if(this.TOKENS[Indice+1].Lexema=="="){
+                        if(this.TOKENS[Indice+3].Lexema==";"){
+                            this.Traduccion+=this.EI()+Token+"="+this.QuitaEspacios(this.TOKENS[Indice+2].Lexema.toString())+"\n";
+                            Indice=Indice+3;
+                        }
+                    }
+                }
             }
             //Imprime en consola la traduccion
-            if (Indice==this.TOKENS.length-1){const Texto= <HTMLInputElement>document.getElementsByClassName("CONSOLA")[0];Texto.value=this.Traduccion.toString();}
+            if (Indice==this.TOKENS.length-1){
+                const Texto= <HTMLInputElement>document.getElementsByClassName("CONSOLA")[0];Texto.value=this.Traduccion.toString();
+                const Texto1= <HTMLInputElement>document.getElementsByClassName("HTML")[0];Texto1.value=this.TraduccionHTML;
+                const Texto2= <HTMLInputElement>document.getElementsByClassName("JSON")[0];Texto2.value=this.TraduccionJSON;
+            }
         }
     }
 
@@ -300,5 +383,322 @@ export class Metodos{
             Espacio+=" ";
         }
         return Espacio;
+    }
+    EIHTML():string{//Espacio Identacion HTML
+        let Espacio="";
+        for(let Nespacios:number=0;Nespacios<this.ContIdentacionHTML;Nespacios++){
+            Espacio+="\t";
+        }
+        return Espacio;
+    }
+    HTML_JSON(Texto:string):void{
+        let Etiqueta:string="";
+        let HTML:string[]=[];
+        for(let i:number=0;i<Texto.length;i++){
+            let letra:string=Texto.charAt(i);
+            if(letra=="<"){
+                for(let aux:number=i+1;aux<Texto.length;aux++){
+                    if((Texto.charAt(aux)==" "||Texto.charAt(aux)==">")&& Etiqueta!=""){
+                        if(Etiqueta=="body"||Etiqueta=="div"){
+                            HTML.push(Etiqueta);
+                            let style:string="";
+                            for(let aux2:number=aux;aux2<Texto.length;aux2++){
+                                if(Texto.charAt(aux2)==">"){
+                                    HTML.push(style)
+                                    aux=aux2;
+                                    break;
+                                }else{
+                                    style+=Texto.charAt(aux2);
+                                }
+                            }
+                        }else if(Etiqueta=="head"||Etiqueta=="br"||Etiqueta=="html"||Etiqueta=="input"||
+                        Etiqueta=="/html"||Etiqueta=="/head"||Etiqueta=="/button"||Etiqueta=="/label"||Etiqueta=="/h1"||Etiqueta=="/h2"||
+                        Etiqueta=="/h3"||Etiqueta=="/h4"||Etiqueta=="/title"||Etiqueta=="/body"||Etiqueta=="/div"||Etiqueta=="/p"){
+                            HTML.push(Etiqueta);
+                            for(let aux2:number=aux;aux2<Texto.length;aux2++){
+                                if(Texto.charAt(aux2)==">"){
+                                    aux=aux2;
+                                    break;
+                                }
+                            }
+                        }else if(Etiqueta=="title"||Etiqueta=="p"||Etiqueta=="h1"||Etiqueta=="h2"||Etiqueta=="h3"||Etiqueta=="h4"||
+                        Etiqueta=="button"||Etiqueta=="label"){
+                            HTML.push(Etiqueta);
+                            for(let aux2:number=aux;aux2<Texto.length;aux2++){
+                                if(Texto.charAt(aux2)==">"){
+                                    let Tex:string="";
+                                    for(let aux3:number=aux2+1;aux3<Texto.length;aux3++){
+                                        console.log(Tex);
+                                        if(Texto.charAt(aux3)=="<" && Texto.charAt(aux3+1)=="/" ){
+                                            aux2=aux3-1;
+                                            console.log(Tex+"ACEPTA");
+                                            HTML.push(Tex);
+                                            break;
+                                        }
+                                        else if(Texto.charAt(aux3)=="<" && Texto.charAt(aux3+1)=="b" && Texto.charAt(aux3+2)=="r" && Texto.charAt(aux3+3)==">"){
+                                            aux3=aux3+3;
+                                            Tex+="\n";
+                                        }
+                                        else{Tex+=Texto.charAt(aux3);}
+                                    }
+                                    aux=aux2;
+                                    break;
+                                }
+                            }
+                        }
+                        Etiqueta="";
+                        i=aux;
+                        break;
+                    }
+                    else{
+                        if(Texto.charAt(aux)==" "&& Etiqueta==""){}
+                        else{Etiqueta+=Texto.charAt(aux);}
+                    }
+                }
+            }
+        }
+        //traduccion HTML JSON
+        for(let i=0;i<HTML.length;i++){
+            let element=HTML[i];
+            if(element=="html"){
+                this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">\n";
+                this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                this.ContIdentacionHTML++;
+            }
+            else if(element=="head"){
+                this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">\n";
+                this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                this.ContIdentacionHTML++;
+            }
+            else if(element=="body"||element=="div"){
+                try {
+                    let Html="",Json="";
+                    Html+=this.EIHTML()+"<"+element.toUpperCase()+" ";
+                    Json+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    if(this.QuitaEspacios(HTML[i+1])!="\"\""){
+                        Html+=this.QuitaEspacios(HTML[i+1])+">\n";
+                        Json+=this.EIHTML()+"\"STYLE\":"+this.QuitaEspacios(HTML[i+1]).split("=")[1]+"\n";
+                        this.TraduccionHTML+=Html;
+                        this.TraduccionJSON+=Json;
+                    }else{
+                        Html+=">\n";
+                        this.TraduccionHTML+=Html;
+                        this.TraduccionJSON+=Json;
+                    }
+                } catch (error) {}
+            }
+            else if(element=="title"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/title"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }} catch (error) {}
+            }
+            else if(element=="p"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/p"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="h1"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/h1"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="h2"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/h2"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="h3"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/h3"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="h4"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/h4"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="button"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/button"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="label"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionHTML+=HTML[i+1];
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\""+HTML[i+1]+"\"\n";
+                    this.ContIdentacionHTML--;
+                    if(HTML[i+2]=="/label"){
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+2;
+                    }else{
+                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionJSON+=this.EIHTML()+"}\n";
+                        i=i+1;
+                    }
+                    } catch (error) {}
+            }
+            else if(element=="br"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\"\\n\"\n";
+                    this.ContIdentacionHTML--;
+                    this.TraduccionJSON+=this.EIHTML()+"}\n";
+                    } catch (error) {}
+            }
+            else if(element=="/label"||element=="/button"||element=="/h1"||element=="/h2"||element=="/h3"||element=="/h4"||
+            element=="/title"||element=="/p"||element=="/head"||element=="/html"||element=="/body"||element=="/div"){
+                this.ContIdentacionHTML--;
+                this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">\n";
+                this.TraduccionJSON+=this.EIHTML()+"}\n";
+            }else if(element=="input"){
+                try {
+                    this.TraduccionHTML+=this.EIHTML()+"<"+element.toUpperCase()+">\n";
+                    this.TraduccionJSON+=this.EIHTML()+"\""+element.toUpperCase()+"\":{\n";
+                    this.ContIdentacionHTML++;
+                    this.TraduccionJSON+=this.EIHTML()+"\"TEXTO\":\"\"\n";
+                    this.ContIdentacionHTML--;
+                    this.TraduccionJSON+=this.EIHTML()+"}\n";
+                    } catch (error) {}
+            }
+        }
+    }
+
+    HTML_ERRORES_TOKENS(){
+        const TablaTokens=document.getElementsByClassName("TOKENS")[0];
+        const TablaERRORES=document.getElementsByClassName("ERRORES")[0];
+        Globales.TOKENS.forEach(element => {
+            let Fila=document.createElement("tr");
+            let ID=document.createElement("td");
+            let Lexema=document.createElement("td");
+            let fila=document.createElement("td");
+            let columna=document.createElement("td");
+            ID.innerHTML=element.Id.toString();
+            Lexema.innerHTML=element.Lexema.toString();
+            fila.innerHTML=element.Fila.toString();
+            columna.innerHTML=element.Columna.toString();
+            Fila.appendChild(ID);Fila.appendChild(Lexema);Fila.appendChild(fila);Fila.appendChild(columna);
+            TablaTokens.appendChild(Fila);
+        });
+        Globales.ERRORES.forEach(element => {
+            let Fila=document.createElement("tr");
+            let ID=document.createElement("td");
+            let Lexema=document.createElement("td");
+            let fila=document.createElement("td");
+            let columna=document.createElement("td");
+            let tipo=document.createElement("td");
+            let esperado=document.createElement("td");
+            ID.innerHTML=element.Id.toString();
+            Lexema.innerHTML=element.Lexema.toString();
+            tipo.innerHTML=element.Tipo.toString();
+            esperado.innerHTML=element.Esperado.toString();
+            fila.innerHTML=element.Fila.toString();
+            columna.innerHTML=element.Columna.toString();
+            Fila.appendChild(ID);Fila.appendChild(Lexema);Fila.appendChild(tipo);Fila.appendChild(esperado);Fila.appendChild(fila);Fila.appendChild(columna);
+            TablaERRORES.appendChild(Fila);
+        });
     }
 }

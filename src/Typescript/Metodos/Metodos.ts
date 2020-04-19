@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import {Globales} from '../Globales';
 import {Tokens} from '../TDA/Tokens';
 import { Error } from '../TDA/Errores';
+import { saveAs } from 'file-saver';
+var require: any;
 export class Metodos{
     TOKENS:Tokens[]=[];
     ContIdentacion;
@@ -346,14 +348,16 @@ export class Metodos{
                     }
                 } catch (error) {}
             }else{
-                if(Token!=";"||Token!="}"||Token!="{"||Token!="("||Token!=")"){
-                    if(this.TOKENS[Indice+1].Lexema=="="){
-                        if(this.TOKENS[Indice+3].Lexema==";"){
-                            this.Traduccion+=this.EI()+Token+"="+this.QuitaEspacios(this.TOKENS[Indice+2].Lexema.toString())+"\n";
-                            Indice=Indice+3;
+                try {
+                    if(Token!=";"||Token!="}"||Token!="{"||Token!="("||Token!=")"){
+                        if(this.TOKENS[Indice+1].Lexema=="="){
+                            if(this.TOKENS[Indice+3].Lexema==";"){
+                                this.Traduccion+=this.EI()+Token+"="+this.QuitaEspacios(this.TOKENS[Indice+2].Lexema.toString())+"\n";
+                                Indice=Indice+3;
+                            }
                         }
                     }
-                }
+                } catch (error) {}
             }
             //Imprime en consola la traduccion
             if (Indice==this.TOKENS.length-1){
@@ -501,7 +505,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/TITLE"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }} catch (error) {}
@@ -519,7 +523,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/P"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -538,7 +542,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/H1"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -557,7 +561,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/H2"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -576,7 +580,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/H3"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -595,7 +599,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/H4"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -614,7 +618,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/BUTTON"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -633,7 +637,7 @@ export class Metodos{
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+2;
                     }else{
-                        this.TraduccionHTML+="<"+HTML[i+2].toUpperCase()+">\n";
+                        this.TraduccionHTML+="<"+"/LABEL"+">\n";
                         this.TraduccionJSON+=this.EIHTML()+"}\n";
                         i=i+1;
                     }
@@ -700,5 +704,63 @@ export class Metodos{
             Fila.appendChild(ID);Fila.appendChild(Lexema);Fila.appendChild(tipo);Fila.appendChild(esperado);Fila.appendChild(fila);Fila.appendChild(columna);
             TablaERRORES.appendChild(Fila);
         });
+    }
+
+    CrearArchivo(Texto:string,Nombre:string){
+        try {
+          var Archivo:File=new File([Texto],Nombre);
+          saveAs(Archivo);
+        } catch (error) {
+          alert("NO SE GUARDO EL ARCHIVO");
+        }
+    }
+
+    HTML_Tokens():string{
+        let HTML:string="";
+        HTML+="<html>\n\t<body >";
+        HTML+="<table  border=\"1\" style=\"position: absolute; left: 20%;right:20%; top: 5%;color: black;border-color: black;\">\n";
+        HTML+="<tr>\n";
+        HTML+="<th> ID </th>\n";
+        HTML+="<th> LEXEMA </th>\n";
+        HTML+="<th> FILA </th>\n";
+        HTML+="<th> COLUMNA </th>\n";
+        HTML+="</tr>\n";
+        Globales.TOKENS.forEach(element => {
+            HTML+="<tr>\n";
+            HTML+="<td>"+element.Id+"</td>\n";
+            HTML+="<td>"+element.Lexema+"</td>\n";
+            HTML+="<td>"+element.Fila+"</td>\n";
+            HTML+="<td>"+element.Columna+"</td>\n";
+            HTML+="</tr>\n";
+        });
+        HTML+="</table>";
+        HTML+="</html>\n\t</body>";
+        return HTML;
+    }
+    HTML_Errores():string{
+        let HTML:string="";
+        HTML+="<html>\n\t<body >";
+        HTML+="<table  border=\"1\" style=\"position: absolute; left: 5%; top: 5%;color: black;border-color: black;\">\n";
+        HTML+="<tr>\n";
+        HTML+="<th> ID </th>\n";
+        HTML+="<th> LEXEMA </th>\n";
+        HTML+="<th> TIPO </th>\n";
+        HTML+="<th> ESPERADO </th>\n"; 
+        HTML+="<th> FILA </th>\n";
+        HTML+="<th> COLUMNA </th>\n";
+        HTML+="</tr>\n";
+        Globales.ERRORES.forEach(element => {
+            HTML+="<tr>\n";
+            HTML+="<td>"+element.Id+"</td>\n";
+            HTML+="<td>"+element.Lexema+"</td>\n";
+            HTML+="<td>"+element.Tipo+"</td>\n";
+            HTML+="<td>"+element.Esperado+"</td>\n";
+            HTML+="<td>"+element.Fila+"</td>\n";
+            HTML+="<td>"+element.Columna+"</td>\n";
+            HTML+="</tr>\n";
+        });
+        HTML+="</table>";
+        HTML+="</html>\n\t</body>";
+        return HTML;
     }
 }

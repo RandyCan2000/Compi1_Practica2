@@ -11,7 +11,7 @@ export class Automata{
         Globales.ERRORES=[];
         let PVoidID=false;
         let PVarFun=false;
-        let Estado:number=0;
+        let Estado:number=-1;
         let Fila:number=1;
         let Columna:number=0;
         let Letra:string="";
@@ -22,12 +22,36 @@ export class Automata{
             else{Columna++;}
             switch (Estado) {
                 //Redireccion a las demas estados
+                case -1:
+                    if(Letra=="\n"||Letra=="\t"||Letra==" "){Estado=-1;}
+                    else if(Letra=="c"){
+                        for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                            if(Texto.charAt(Aux)==" " ||Texto.charAt(Aux)=="\n"||Texto.charAt(Aux)=="\t"){
+                                if(Token=="class"){Estado=-2;Indice=Aux;break;}
+                                else{this.ERR=new Error("SINTACTICO","class",Fila,Columna);Estado=400;}
+                            }else if(Texto.charAt(Aux)=="{"){
+                                Estado=0;
+                                Indice=Aux;break;
+                            }
+                            else{Token+=Texto.charAt(Aux);}
+                        }
+                    }
+                break;
+                case -2:
+                    for(let Aux:number=Indice;Aux<Texto.length;Aux++){
+                        if(Texto.charAt(Aux)=="{"){
+                            Indice=Aux;Estado=0;break;
+                        }else{
+                            Token+=Texto.charAt(Aux);
+                        }
+                    }
+                    break;
                 case 0:
                     Token="";
                     let PosText:String="";
                     let Permiso:boolean=false;
                     for(let Aux:number=Indice;Aux<Texto.length;Aux++){
-                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"||Texto.charAt(Aux)=="."||Texto.charAt(Aux)=="\n"){
+                        if(Texto.charAt(Aux)==" "||Texto.charAt(Aux)=="="||Texto.charAt(Aux)==";"||Texto.charAt(Aux)=="("||Texto.charAt(Aux)=="{"||Texto.charAt(Aux)=="."||Texto.charAt(Aux)=="\n"||Texto.charAt(Aux)==":"){
                             if(PosText=="int"||PosText=="char"||PosText=="double"||PosText=="string"||PosText=="bool"||
                             PosText=="void"||PosText=="if"||PosText=="while"||PosText=="do"||PosText=="else"||PosText=="for"||
                             PosText=="switch"||PosText=="case"||PosText=="break"||PosText=="continue"||PosText=="return"||PosText=="Console"||
@@ -1169,6 +1193,12 @@ export class Automata{
         alert("SE TERMINO EL ANALISIS");
         let M=new Metodos();
         M.HTML_ERRORES_TOKENS();
+        if(Globales.ERRORES.length!=0){
+           M.CrearArchivo(M.HTML_Tokens(),"TOKENS.html");
+           M.CrearArchivo(M.HTML_Errores(),"ERRORES.html");
+        }else{
+            M.CrearArchivo(M.HTML_Tokens(),"TOKENS.html");
+        }
         //Imprimir
         this.Imprimir();
     }

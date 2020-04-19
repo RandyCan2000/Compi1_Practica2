@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {Globales} from '../Typescript/Globales';
 import {Automata} from '../Typescript/Metodos/Automata';
 import {Metodos} from '../Typescript/Metodos/Metodos';
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,6 +10,7 @@ import {Metodos} from '../Typescript/Metodos/Metodos';
 })
 export class AppComponent {
   AU:Automata=new Automata();
+  M1:Metodos=new Metodos();
   constructor(){}
 
     leerArchivo(Direccion:FileList) {
@@ -34,6 +36,15 @@ export class AppComponent {
             document.getElementById("NombreSeleccion").innerHTML = Globales.ContadorPestania + ":" + file.name;
             Titulo.setAttribute("id", "Boton");
             Titulo.style.outline = "none";
+            Titulo.ondblclick=function(){
+              const Texto= <HTMLInputElement>document.getElementById(Titulo.innerHTML);
+              try {
+                var Archivo:File=new File([Texto.value],file.name);
+                saveAs(Archivo);
+              } catch (error) {
+                alert("NO SE GUARDO EL ARCHIVO");
+              }
+            }
             Titulo.onclick = function () {
               Globales.Seleccionado = Titulo.innerHTML;
               document.getElementById("NombreSeleccion").innerHTML = Titulo.innerHTML;
@@ -49,7 +60,6 @@ export class AppComponent {
               return false;}};
               //fin tab
             };
-
             document.getElementById("Botones").appendChild(Titulo);
             div.appendChild(CajaTexto);
             div.style.marginLeft = "20%";
@@ -103,4 +113,18 @@ export class AppComponent {
       M.Traducir("",0);
     }
 
+    GuardarRep(Rep:string){
+      if(Rep=="JSON"){
+        const Texto= <HTMLInputElement>document.getElementsByClassName("JSON")[0];
+        this.M1.CrearArchivo(Texto.value,"JSON.json"); 
+      }
+      else if(Rep=="HTML"){
+        const Texto= <HTMLInputElement>document.getElementsByClassName("HTML")[0];
+        this.M1.CrearArchivo(Texto.value,"HTML.html");
+      }
+      else if(Rep=="CONSOLA"){
+        const Texto= <HTMLInputElement>document.getElementsByClassName("CONSOLA")[0];
+        this.M1.CrearArchivo(Texto.value,"TRADUCCION.py");
+      }
+    }
 }

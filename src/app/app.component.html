@@ -22,9 +22,9 @@
   
   </div>
   <div id="BotonesReportes">
-    <button id="Boton" (click)="MostarRep('CONSOLA')">CONSOLA</button>
-    <button id="Boton" (click)="MostarRep('HTML')">HTLM</button>
-    <button id="Boton" (click)="MostarRep('JSON')">JSON</button>
+    <button id="Boton" (click)="MostarRep('CONSOLA')" (dblclick)="GuardarRep('CONSOLA')">CONSOLA</button>
+    <button id="Boton" (click)="MostarRep('HTML')" (dblclick)="GuardarRep('HTML')">HTLM</button>
+    <button id="Boton" (click)="MostarRep('JSON')" (dblclick)="GuardarRep('JSON')">JSON</button>
     <button id="Boton" (click)="MostarRep('VARIABLES')">VARIABLES</button>
     <button id="Boton" (click)="MostarRep('TOKENS')">TOKENS</button>
     <button id="Boton" (click)="MostarRep('ERRORES')">ERRORES</button>
@@ -71,4 +71,3 @@
         </table>
       </div>
   </div>
-  

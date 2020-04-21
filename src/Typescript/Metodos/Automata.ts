@@ -1125,15 +1125,25 @@ export class Automata{
                     break;
                 case 47:
                     Token="";
+                    let permiso:boolean=false;
                     for(let Aux:number=Indice;Aux<Texto.length;Aux++){
-                        if(Texto.charAt(Aux)==")"){
+                        if(Texto.charAt(Aux)==")" && permiso==false){
                             this.TOK=new Tokens(Token,Fila,Columna);
                             Globales.TOKENS.push(this.TOK);
                             this.TOK=new Tokens(")",Fila,Columna);
                             Globales.TOKENS.push(this.TOK);Token="";Estado=41;
                             Indice=Aux;
                             break;
-                        }else{Token+=Texto.charAt(Aux)}
+                        }
+                        else if((Texto.charAt(Aux)=="\""||Texto.charAt(Aux)=="\'")&&permiso==false){
+                            Token+=Texto.charAt(Aux);
+                            permiso=true;
+                        }
+                        else if((Texto.charAt(Aux)=="\""||Texto.charAt(Aux)=="\'")&&permiso==true){
+                            Token+=Texto.charAt(Aux);
+                            permiso=false;
+                        }
+                        else{Token+=Texto.charAt(Aux);}
                     }
                     break;
                 case 399://Errores Lexicos

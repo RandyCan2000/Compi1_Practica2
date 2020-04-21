@@ -221,10 +221,21 @@ export class Metodos{
                                         if(this.TOKENS[Indice+12].Lexema=="++"||this.TOKENS[Indice+12].Lexema=="--"){
                                             if(this.TOKENS[Indice+13].Lexema==")"){
                                                 if(this.TOKENS[Indice+14].Lexema=="{"){
-                                                    this.Traduccion+=this.EI()+Token+" "+this.TOKENS[Indice+3].Lexema+" in range"+"("+this.TOKENS[Indice+5].Lexema+","+this.TOKENS[Indice+9].Lexema+"):\n";
-                                                    this.Ciclo.push(Token.toString());
-                                                    this.ContIdentacion++;
-                                                    Indice=Indice+14;
+                                                    let a:number=parseInt(this.TOKENS[Indice+5].Lexema.toString());
+                                                    let b:number=parseInt(this.TOKENS[Indice+9].Lexema.toString());
+                                                    if(b>a){
+                                                        this.Traduccion+=this.EI()+Token+" "+this.TOKENS[Indice+3].Lexema+" in range"+"("+this.TOKENS[Indice+5].Lexema+","+this.TOKENS[Indice+9].Lexema+"):\n";
+                                                        this.Ciclo.push(Token.toString());
+                                                        this.ContIdentacion++;
+                                                        Indice=Indice+14;
+                                                    }
+                                                    else if(a>b){
+                                                        this.Traduccion+=this.EI()+Token+" "+this.TOKENS[Indice+3].Lexema+" in range"+"("+this.TOKENS[Indice+5].Lexema+","+this.TOKENS[Indice+9].Lexema+",-1):\n";
+                                                        this.Ciclo.push(Token.toString());
+                                                        this.ContIdentacion++;
+                                                        Indice=Indice+14;
+                                                    }
+                                                    
                                                 }
                                             }
                                         }
